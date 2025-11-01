@@ -28,33 +28,33 @@ mkdir -p "$REPORT_DIR" "$SCRIPT_DIR/logs"
 # Function: Display usage information
 usage() {
 	cat << EOF
-	${BOLD}TechCorp Linux System Administration Toolkit${RESET}
+${BOLD}TechCorp Linux System Administration Toolkit${RESET}
 
-	${BOLD}Usage:${RESET}
+${BOLD}Usage:${RESET}
 	$0 [options] [command]
 
-	${BOLD}COMMANDS:${RESET}
-		info        - Display system information
-		audit       - Run user and permission audit
-		security	- Perform security compliance scan
-		full		- Run complete system analysis (default)
-		report		- Generate comprehensive report
+${BOLD}COMMANDS:${RESET}
+	info        - Display system information
+	audit       - Run user and permission audit
+	security    - Perform security compliance scan
+	full        - Run complete system analysis (default)
+	report      - Generate comprehensive report
 
-	${BOLD}OPTION:{RESET}
-		-h,	--help		Show this help message
-		-v,	--version	Display version information
-		-o,	--output	Specific custom report filename
+${BOLD}OPTIONS:${RESET}
+	-h, --help      Show this help message
+	-v, --version   Display version information
+	-o, --output    Specify custom report filename
 
-	${BOLD}EXAMPLE:${RESET}
-		$0	full					# Run full system audit
-		$0	security				# Security scan only
-		$0	-o custom_report.txt	# Custom report filename
+${BOLD}EXAMPLES:${RESET}
+	$0 full                     # Run full system audit
+	$0 security                 # Security scan only
+	$0 -o custom_report.txt     # Custom report filename
 
-	${BOLD}REPORT LOCATION:${RESET}
-		Reports saved to: $REPORT_DIR/
+${BOLD}REPORT LOCATION:${RESET}
+	Reports saved to: $REPORT_DIR/
 
-	EOF
-		exit 0
+EOF
+	exit 0
 }
 
 ###################################################################################
@@ -85,7 +85,7 @@ run_full_analysis() {
 }
 
 ###################################################################################
-# Function; Generate comprehensive report
+# Function: Generate comprehensive report
 generate_report() {
 	print_header "TechCorp System Administration Report"
 
@@ -94,7 +94,7 @@ generate_report() {
 	{
 		echo "==============================================="
 		echo "TechCorp Linux System Administration Report"
-		echo "=============================================="
+		echo "==============================================="
 		echo ""
 		echo "Generated: $(date '+%Y-%m-%d %H:%M:%S')"
 		echo "Hostname: $(hostname)"
@@ -104,11 +104,11 @@ generate_report() {
 		echo ""
 
 		# Run all checks and capture output
-		bash "$SCRIPT_DIR/modules/system-info.sh" 2>&1 | tee -a "$REPORT_FILE"
+		bash "$SCRIPT_DIR/modules/system-info.sh" 2>&1
 		echo
-		bash "$SCRIPT_DIR/modules/user-audit.sh" 2>&1 | tee -a "$REPORT_FILE"
+		bash "$SCRIPT_DIR/modules/user-audit.sh" 2>&1
 		echo
-		bash "$SCRIPT_DIR/modules/security-check.sh" 2>&1 | tee -a "$REPORT_FILE"
+		bash "$SCRIPT_DIR/modules/security-check.sh" 2>&1
 		echo
 		echo "==============================================="
 		echo "End of Report"
@@ -124,7 +124,7 @@ generate_report() {
 main() {
 	# Check if running with sufficient privileges for security checks
 	if [[ $EUID -ne 0 ]]; then
-		print_warning "Some checks require root privileges, Run with sudo for full audit"
+		print_warning "Some checks require root privileges. Run with sudo for full audit"
 	fi
 
 	# Parse command line arguments
