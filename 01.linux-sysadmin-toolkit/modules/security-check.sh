@@ -5,7 +5,7 @@
 # Author: samiulAsumel
 
 # Source Utilities
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$SCRIPT_DIR"/utils/logger.sh
 source "$SCRIPT_DIR"/utils/colors.sh
 
@@ -18,11 +18,11 @@ security_scan() {
 	# Check 1: World-writable files in critical directories
 	print_section "Check: World-writable Files in Critical Directories"
 	local writable
-	writable=$(find /etc /bin/ /sbin /usr/bin /usr/sbin -type f -perm -002 2>/dev/null)
+	writable=$(find /etc /bin /sbin /usr/bin /usr/sbin -type f -perm -002 2>/dev/null)
 
 	if [[ -n "$writable" ]]; then
 		print_error "Found world-writable files in system directories:"
-		echo "$writable" | head -n 13 | sed 's/^/ - /'
+		echo "$writable" | head -n 13 | sed 's/^/  - /'
 		((issues++))
 	else
 		print_success "No world-writable files found in system directories."
@@ -37,7 +37,7 @@ security_scan() {
 	echo "Total SUID/SGID files found: $suid_count"
 
 	if [[ $suid_count -gt 50 ]]; then
-		print_warning "High number of SUID/SGID files - review recommendations."
+		print_warning "High number of SUID/SGID files - review recommended."
 		((issues++))
 	else
 		print_success "SUID/SGID files count within acceptable range."
@@ -51,14 +51,14 @@ security_scan() {
 			print_error "Root login via SSH is ENABLED (security risk)."
 			((issues++))
 		else
-			print_success "Root login via SSH is disabled"
+			print_success "Root login via SSH is disabled."
 		fi
 
 		if grep -q "^PasswordAuthentication yes" /etc/ssh/sshd_config; then
-			print_warning "Password Authentication is enabled (consider key based authentication)."
+			print_warning "Password authentication is enabled (consider key-based authentication)."
 			((issues++))
 		else
-			print_success "Password Authentication is disabled"
+			print_success "Password authentication is disabled."
 		fi
 	else
 		print_info "SSH not configured on this system."
@@ -68,11 +68,11 @@ security_scan() {
 	print_section "Check: Firewall Status"
 	
 	if systemctl is-active --quiet firewalld; then
-		print_success "Firewalld is active and running"
+		print_success "Firewalld is active and running."
 	elif systemctl is-active --quiet iptables; then
-		print_success "Iptables is active and running"
+		print_success "Iptables is active and running."
 	else
-		print_error "No firewall is active and running"
+		print_error "No firewall is active and running."
 		((issues++))
 	fi
 
@@ -80,12 +80,12 @@ security_scan() {
 	print_section "Check: SELinux Status"
 
 	if command -v getenforce &> /dev/null; then
-	local selinux_status
-	selinux_status=$(getenforce)
+		local selinux_status
+		selinux_status=$(getenforce)
 
 		case "$selinux_status" in
 			Enforcing)
-				print_success "SELinux is Enforcing mode"
+				print_success "SELinux is in Enforcing mode."
 				;;
 			Permissive)
 				print_warning "SELinux is in Permissive mode (logs but doesn't block)."
@@ -108,7 +108,7 @@ security_scan() {
 		print_error "Found $issues security issue(s) requiring attention."
 	fi
 
-	log_info "Security Scan completed with $issues issue(s)."
+	log_info "Security scan completed with $issues issue(s)."
 }
 
 # Execute if run directly

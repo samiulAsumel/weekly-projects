@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# System Information Collection module
+# System Information Collection Module
 # Gather comprehensive hardware and OS details
 # Author: samiulAsumel
 
 # Source utilities
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$SCRIPT_DIR"/utils/logger.sh
 source "$SCRIPT_DIR"/utils/colors.sh
 
 # Function to collect system information
 collect_system_info() {
-	print_header "SYSTEM INFORMATION"
+	print_header "System Information"
 	log_info "Collecting system information..."
 
 	# Hostname and Domain
@@ -34,7 +34,7 @@ collect_system_info() {
 	echo "CPU Cores: $(nproc)"
 	echo "Total RAM: $(free -h | grep Mem | awk '{print $2}')"
 	echo "Used RAM: $(free -h | grep Mem | awk '{print $3}')"
-	echo "Free Ram: $(free -h | grep Mem | awk '{print $4}')"
+	echo "Free RAM: $(free -h | grep Mem | awk '{print $4}')"
 
 	# Disk Information
 	print_section "Disk Usage"
@@ -42,19 +42,18 @@ collect_system_info() {
 
 	# Load Average
 	print_section "Load Average"
-	# Use /proc/loadavg to reliably retrieve the 1/5/15-minute load averages
-	awk '{print $1, $2, $3}' /proc/loadavg
+	echo "Load Average (1/5/15 min): $(awk '{print $1, $2, $3}' /proc/loadavg)"
 
 	# Process Count
 	print_section "Process Statistics"
 	echo "Total Processes: $(ps -e --no-headers | wc -l)"
-	echo "Running Processes: $(ps -eo state --no-headers | awk '{print $1}' | grep -c '^R')"
-	echo "Sleeping Processes: $(ps -eo state --no-headers | awk '{print $1}' | grep -c '^S')"
-	echo "Stopped Processes: $(ps -eo state --no-headers | awk '{print $1}' | grep -c '^T')"
-	echo "Zombie Processes: $(ps -eo state --no-headers | awk '{print $1}' | grep -c '^Z')"
-	echo "Uninterruptible Sleeps: $(ps -eo state --no-headers | awk '{print $1}' | grep -c '^D')"
+	echo "Running Processes: $(ps -eo state --no-headers | grep -c '^R')"
+	echo "Sleeping Processes: $(ps -eo state --no-headers | grep -c '^S')"
+	echo "Stopped Processes: $(ps -eo state --no-headers | grep -c '^T')"
+	echo "Zombie Processes: $(ps -eo state --no-headers | grep -c '^Z')"
+	echo "Uninterruptible Sleeps: $(ps -eo state --no-headers | grep -c '^D')"
 
-	log_info "System Information Collection Successfully Completed"
+	log_info "System information collection completed successfully."
 }
 
 # Execute if run directly

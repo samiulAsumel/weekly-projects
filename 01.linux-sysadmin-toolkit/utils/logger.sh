@@ -4,7 +4,7 @@
 # Provides standardized logging with timestamps and levels
 # Author: samiulAsumel
 
-# Default file (can be overridden by exporting LOG_FILE)
+# Default log file (can be overridden by exporting LOG_FILE)
 LOG_FILE="${LOG_FILE:-/var/log/sysadmin-toolkit.log}"
 # Default log level: DEBUG, INFO, WARN, ERROR
 LOG_LEVEL="${LOG_LEVEL:-INFO}"
@@ -54,7 +54,7 @@ log_message() {
 	entry="[$timestamp] [$level] $message"
 	printf '%s\n' "$entry" >>"$LOG_FILE" 2>/dev/null || true
 
-	# TTY-aware colored output for humans
+	# TTY-aware colored output for interactive terminals
 	if [[ -t 1 ]]; then
 		case "$level" in
 			ERROR)

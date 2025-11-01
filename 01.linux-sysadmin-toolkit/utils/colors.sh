@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Color Definitions for Terminal Output
-# Makes report readable and professional
+# Makes reports readable and professional
 # Author: samiulAsumel
 
 # Text Colors
@@ -19,9 +19,9 @@ export BG_GREEN='\033[42m'
 export BG_YELLOW='\033[43m'
 
 # Text Styles
-BOLD='\033[1m'
+export BOLD='\033[1m'
 export UNDERLINE='\033[4m'
-RESET='\033[0m'
+export RESET='\033[0m'
 
 # Convenience Functions
 print_success() {
@@ -41,14 +41,13 @@ print_info() {
 }
 
 print_header() {
-	# Use %b to safely expand backslash escapes and pass the styled string as an argument
 	printf "%b\n" "${BOLD}${BLUE}====================${RESET}"
 	printf "%b\n" "${BOLD}${BLUE}  ${1}${RESET}"
 	printf "%b\n" "${BOLD}${BLUE}====================${RESET}"
 }
 
 print_section() {
-	printf "%b\n" "${BOLD}${BLUE}----------------${RESET}"
-	printf "%b\n" "${BOLD}${BLUE}  ${1}${RESET}"
-	printf "%b\n" "${BOLD}${BLUE}----------------${RESET}"
+	printf "%b\n" "${BOLD}${MAGENTA}----------------${RESET}"
+	printf "%b\n" "${BOLD}${MAGENTA}  ${1}${RESET}"
+	printf "%b\n" "${BOLD}${MAGENTA}----------------${RESET}"
 }
