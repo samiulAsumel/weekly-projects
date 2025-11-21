@@ -1,0 +1,221 @@
+#!/bin/bash
+
+################################################
+# System Health Monitor - TechCorp Ltd.
+# Purpose: Monitor CPU, Memory, Disk and generate alerts
+# Author: samiulAsumel
+################################################
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+# Load configuration
+CONFIG_FILE="/opt/system-health-monitor/config/monitor.conf"
+if [[ f "$CONFIG_FILE" ]]; then
+	source "$CONFIG_FILE"
+else
+	echo "Configuration file not found"
+	exit 1
+fi
+
+# Set up paths
+LOG_DIR="/opt/system-health-monitor/logs"
+REPORT_DIR="/opt/system-health-monitor/reports"
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+LOG_FILE="$LOG_DIR/health-$(date +%Y%m%d).log"
+REPORT_FILE="$REPORT_DIR/health-report-$(date +%Y%m%d_%H%M%S).html"
+
+# Create directories if they don't exist
+mkdir -p "$LOG_DIR" "$REPORT_DIR"
+
+##############################################
+# Function: Log messages
+##############################################
+log_message() {
+	echo "[$TIMESTAMP] $1" | tee -a "$LOG_FILE"
+}
+
+##############################################
+# Function: Get CPU usage
+##############################################
+get_cpu_usage() {
+	# Calculate CPU usage percentage
+	cpu_usage=$(top -bn1 | grep "Cpu(s)" awk '{print $2}' | cut -d'%' -f1)
+	echo "${cpu_usage%.*}" # Removal decimal for comparison
+}
+
+##############################################
+# Function: Get Memory usage
+##############################################
+get_memory_usage() {
+	# Calculate Memory usage percentage
+	memory_usage=$(free | grep Mem | awk '{printf "%.0f", $3/$2 * 100.0}')
+	echo "$memory_usage"
+}
+
+##############################################
+# Function: Get Disk usage
+##############################################
+get_disk_usage() {
+	# Get root partition usage
+	disk_usage=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
+	echo "$disk_usage"
+}
+
+##############################################
+# Function: Get load average
+##############################################
+get_load_average() {
+	# Get 5-minute load average
+	load_average=$(uptime | awk -F'load average:' '{print $2}' | awk -F',' '{print $3}' | xargs)
+	echo "$load_average"
+}
+
+##############################################
+# Function: Get System info
+##############################################
+get_system_info() {
+	# Get system information
+	HOSTNAME=$(hostname)
+	UPTIME=$(uptime -p)
+	KERNEL=$(uname -r)
+	OS_VERSION=$(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)
+}
+
+##############################################
+# Function: Check if metric exceeds threshold
+##############################################
+check_threshold() {
+	local metric_name=$1
+	local current_value=$2
+	local threshold2=$3
+	local status="OK"
+	local color=$GREEN
+
+	# Compare values (handle decimals with bc)
+	if (( $(echo "$current_value > $threshold" | bc -l) )); then
+		status="Warning"
+		color="$RED"
+		log_message "${metric_name} usage is high: ${current_value}% (Threshold: ${threshold}%)"
+	fi
+
+	echo -e "${color}${status}${NC}"
+}
+
+ ###############################################
+# Function: Generate HTML report
+##############################################
+generate_html_report() {
+    cat > "$REPORT_FILE" << EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Health Report - $(hostname)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; 
+                     border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
+        .metric { display: flex; justify-content: space-between; padding: 15px; 
+                  margin: 10px 0; border-left: 4px solid #4CAF50; background: #f9f9f9; }
+        .warning { border-left-color: #ff9800; background: #fff3e0; }
+        .critical { border-left-color: #f44336; background: #ffebee; }
+        .status { font-weight: bold; padding: 5px 10px; border-radius: 4px; }
+        .ok { background: #4CAF50; color: white; }
+        .warn { background: #ff9800; color: white; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #4CAF50; color: white; }
+        .footer { margin-top: 20px; text-align: center; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖥️ System Health Report</h1>
+        <p><strong>Server:</strong> $(hostname)</p>
+        <p><strong>Generated:</strong> $TIMESTAMP</p>
+        <p><strong>Uptime:</strong> $(uptime -p)</p>
+        <p><strong>OS:</strong> $(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)</p>
+        
+        <h2>📊 Current Metrics</h2>
+        
+        <div class="metric $([ $1 -gt $CPU_THRESHOLD ] && echo 'critical' || echo '')">
+            <div><strong>CPU Usage:</strong> ${1}%</div>
+            <div class="status $([ $1 -gt $CPU_THRESHOLD ] && echo 'warn' || echo 'ok')">
+                $([ $1 -gt $CPU_THRESHOLD ] && echo 'WARNING' || echo 'OK')
+            </div>
+        </div>
+        
+        <div class="metric $([ $2 -gt $MEMORY_THRESHOLD ] && echo 'critical' || echo '')">
+            <div><strong>Memory Usage:</strong> ${2}%</div>
+            <div class="status $([ $2 -gt $MEMORY_THRESHOLD ] && echo 'warn' || echo 'ok')">
+                $([ $2 -gt $MEMORY_THRESHOLD ] && echo 'WARNING' || echo 'OK')
+            </div>
+        </div>
+        
+        <div class="metric $([ $3 -gt $DISK_THRESHOLD ] && echo 'critical' || echo '')">
+            <div><strong>Disk Usage (/):</strong> ${3}%</div>
+            <div class="status $([ $3 -gt $DISK_THRESHOLD ] && echo 'warn' || echo 'ok')">
+                $([ $3 -gt $DISK_THRESHOLD ] && echo 'WARNING' || echo 'OK')
+            </div>
+        </div>
+        
+        <div class="metric">
+            <div><strong>Load Average (5-min):</strong> ${4}</div>
+            <div class="status ok">OK</div>
+        </div>
+        
+        <h2>💾 Disk Usage Details</h2>
+        <table>
+            <tr>
+                <th>Filesystem</th>
+                <th>Size</th>
+                <th>Used</th>
+                <th>Available</th>
+                <th>Use%</th>
+                <th>Mounted On</th>
+            </tr>
+$(df -h | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{print "<tr><td>"$1"</td><td>"$2"</td><td>"$3"</td><td>"$4"</td><td>"$5"</td><td>"$6"</td></tr>"}')
+        </table>
+        
+        <h2>🔝 Top 5 CPU Processes</h2>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>PID</th>
+                <th>CPU%</th>
+                <th>MEM%</th>
+                <th>Command</th>
+            </tr>
+$(ps aux --sort=-%cpu | head -6 | tail -5 | awk '{print "<tr><td>"$1"</td><td>"$2"</td><td>"$3"%</td><td>"$4"%</td><td>"$11"</td></tr>"}')
+        </table>
+        
+        <h2>🧠 Top 5 Memory Processes</h2>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>PID</th>
+                <th>CPU%</th>
+                <th>MEM%</th>
+                <th>Command</th>
+            </tr>
+$(ps aux --sort=-%mem | head -6 | tail -5 | awk '{print "<tr><td>"$1"</td><td>"$2"</td><td>"$3"%</td><td>"$4"%</td><td>"$11"</td></tr>"}')
+        </table>
+        
+        <div class="footer">
+            <p>TechCorp Ltd. - DevOps Team | Automated System Health Monitor v1.0</p>
+        </div>
+    </div>
+</body>
+</html>
+EOF
+
+    echo "📄 HTML Report generated: $REPORT_FILE"
+}
+
+###############################################
+# Main script execution
+###############################################
