@@ -134,13 +134,13 @@ generate_html_report() {
 </head>
 <body>
     <div class="container">
-        <h1>🖥️ System Health Report</h1>
+        <h1>System Health Report</h1>
         <p><strong>Server:</strong> $(hostname)</p>
         <p><strong>Generated:</strong> $TIMESTAMP</p>
         <p><strong>Uptime:</strong> $(uptime -p)</p>
         <p><strong>OS:</strong> $(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)</p>
         
-        <h2>📊 Current Metrics</h2>
+        <h2>Current Metrics</h2>
         
         <div class="metric $([ $1 -gt $CPU_THRESHOLD ] && echo 'critical' || echo '')">
             <div><strong>CPU Usage:</strong> ${1}%</div>
@@ -168,7 +168,7 @@ generate_html_report() {
             <div class="status ok">OK</div>
         </div>
         
-        <h2>💾 Disk Usage Details</h2>
+        <h2>Disk Usage Details</h2>
         <table>
             <tr>
                 <th>Filesystem</th>
@@ -181,7 +181,7 @@ generate_html_report() {
 $(df -h | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{print "<tr><td>"$1"</td><td>"$2"</td><td>"$3"</td><td>"$4"</td><td>"$5"</td><td>"$6"</td></tr>"}')
         </table>
         
-        <h2>🔝 Top 5 CPU Processes</h2>
+        <h2>Top 5 CPU Processes</h2>
         <table>
             <tr>
                 <th>User</th>
@@ -193,7 +193,7 @@ $(df -h | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{print "<tr><td>"$1"</td><td
 $(ps aux --sort=-%cpu | head -6 | tail -5 | awk '{print "<tr><td>"$1"</td><td>"$2"</td><td>"$3"%</td><td>"$4"%</td><td>"$11"</td></tr>"}')
         </table>
         
-        <h2>🧠 Top 5 Memory Processes</h2>
+        <h2>Top 5 Memory Processes</h2>
         <table>
             <tr>
                 <th>User</th>
@@ -213,9 +213,49 @@ $(ps aux --sort=-%mem | head -6 | tail -5 | awk '{print "<tr><td>"$1"</td><td>"$
 </html>
 EOF
 
-    echo "📄 HTML Report generated: $REPORT_FILE"
+    echo "HTML Report generated: $REPORT_FILE"
 }
 
 ###############################################
 # Main script execution
 ###############################################
+echo -e "${GREEN}Starting System Health Check...${NC}"
+echo -e "TechCorp Ltd. - DevOps Team"
+echo -e "Automated System Health Monitor"
+
+# Get system information
+get_system_info
+
+# Collect metrics
+CPU_USAGE=$(get_cpu_usage)
+MEMORY_USAGE=$(get_memory_usage)
+DISK_USAGE=$(get_disk_usage)
+LOAD_AVERAGE=$(get_load_average)
+
+# Display metrics on console
+echo -e "Server: ${GREEN}$HOSTNAME${NC}"
+echo -e "Time: ${GREEN}$TIMESTAMP${NC}"
+echo -e "OS: ${GREEN}$OS_VERSION${NC}"
+echo -e "Uptime: ${GREEN}$UPTIME${NC}"
+
+echo ""
+
+echo -e "Current Metrics:"
+echo -e "CPU Usage: $(check_threshold "CPU" "$CPU_USAGE" "$CPU_THRESHOLD") - ${YELLOW}${CPU_USAGE}%${NC}"
+echo -e "Memory Usage: $(check_threshold "Memory" "$MEMORY_USAGE" "$MEMORY_THRESHOLD") - ${YELLOW}${MEMORY_USAGE}%${NC}"
+echo -e "Disk Usage (/): $(check_threshold ""Disk" "$DISK_USAGE" "$DISK_THRESHOLD") - ${YELLOW}${DISK_USAGE}%${NC}"
+echo -e "Load Average (5-min): ${YELLOW}${LOAD_AVERAGE}${NC}"
+
+# Log Metrics
+log_message "CPU: ${CPU_USAGE}%, Memory: ${MEMORY_USAGE}%, Disk: ${DISK_USAGE}%, Load Avg (5-min): ${LOAD_AVERAGE}"
+
+# Generate HTML report
+if [[ "$GENERATE_HTML_REPORT" == "yes" ]]; then
+	generate_html_report "$CPU_USAGE" "$MEMORY_USAGE" "$DISK_USAGE" "$LOAD_AVERAGE"
+fi
+
+# Clean up old log (keep last 30 days)
+find "$LOF_DIR" -name "health-*.log" -type f -mtime +$KEEP_LOG_DAYS -delete
+find "$REPORT_DIR" -name "health-report-*.html" -type f -mtime +$KEEP_LOG_DAYS -delete
+
+echo -e "${GREEN}System Health Check Completed.${NC}"}
