@@ -4,45 +4,94 @@
 # Description: Enterprise-grade user management automation script
 # Author: Samiul alam Sumel
 # Version: 1.0.0
-# Usages: ./user_manager.sh [create|modify|delete|list] [username] [options]
-###############################################################
-#
-# Purpose: Automate user account lifecycle management with:
-# - Input validation and error handling
-# - Comprehensive logging
-# - Automatic backup creation
-# - Security compliance
-#
-# Requirements:
-# - Root/sudo privileges required
-# - RHEL/CentOS/Rocky Linux 8+ compatible
-# - Standard Unix utilities (useradd, usermod, userdel)
+# Usage: ./user_manager.sh [create|modify|delete|list] [username] [options]
 ###############################################################
 
 #-------------------------------------------------------------
 # Global Variables
-# These variables are accessible throughout entire script
 #-------------------------------------------------------------
 
 # Script metadata
-# $0 contains script name as called
-# basename extracts filename from path
-SCRIPT_NAME=$(basename "$0")
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-VERSION="1.0.0"
-
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-CURRENT_DATE=$(date +%Y-%m-%d)
-CURRENT_TIME=$(date +%H:%M:%S)
 
 # Load configuration file
-# Source command executes config file in current shell
-# Imports all variables defined in config file
 CONFIG_FILE="$SCRIPT_DIR/config/script.conf"
 if [[ -f "$CONFIG_FILE" ]]; then
+	# shellcheck source=/dev/null
 	source "$CONFIG_FILE"
 else
-	# Exit if config missing - script cannot run without settings
-	echo "ERROR: Configuration file not found: $CONFIG_FILE"
+	echo "ERROR: Configuration file not found: $CONFIG_FILE" >&2
 	exit 1
 fi
+
+# Logging paths
+LOG_PATH="$SCRIPT_DIR/$LOG_DIR"
+OPERATION_LOG_FILE="$LOG_PATH/$OPERATION_LOG"
+ERROR_LOG_FILE="$LOG_PATH/$ERROR_LOG"
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+#----------------------------------------------------
+# Logging Functions
+#----------------------------------------------------
+log_message() {
+	local level="$1"
+	local message="$2"
+	local timestamp
+	timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+	mkdir -p "$LOG_PATH"
+	echo "[$timestamp] [$level] $message" >>"$OPERATION_LOG_FILE"
+	echo -e "${BLUE}[$timestamp] [$level] $message${NC}"
+}
+
+log_error() {
+	local message="$1"
+	local timestamp
+	timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+	mkdir -p "$LOG_PATH"
+	echo "[$timestamp] [ERROR] $message" >>"$ERROR_LOG_FILE"
+	echo "[$timestamp] [ERROR] $message" >>"$OPERATION_LOG_FILE"
+	echo -e "${RED}[$timestamp] [ERROR] $message${NC}" >&2
+}
+
+log_success() {
+	local message="$1"
+	local timestamp
+	timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+	mkdir -p "$LOG_PATH"
+	echo "[$timestamp] [SUCCESS] $message" >>"$OPERATION_LOG_FILE"
+	echo -e "${GREEN}[$timestamp] [SUCCESS] $message${NC}"
+}
+
+#----------------------------------------------------
+# Main Function
+#----------------------------------------------------
+main() {
+	local action="$1"
+	local username="$2"
+
+	case "$action" in
+	create | modify | delete | list)
+		if [[ -z "$username" && "$action" != "list" ]]; then
+			log_error "Username required for $action operation"
+			exit 1
+		fi
+		log_message "INFO" "Starting $action operation${username:+ for user: $username}"
+		;;
+	*)
+		log_error "Invalid action: $action"
+		echo "Usage: $0 {create|modify|delete|list} [username]" >&2
+		exit 1
+		;;
+	esac
+}
+
+# Execute main function with all arguments
+main "$@"
