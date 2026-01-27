@@ -69,29 +69,3 @@ log_success() {
 	echo "[$timestamp] [SUCCESS] $message" >>"$OPERATION_LOG_FILE"
 	echo -e "${GREEN}[$timestamp] [SUCCESS] $message${NC}"
 }
-
-#----------------------------------------------------
-# Main Function
-#----------------------------------------------------
-main() {
-	local action="$1"
-	local username="$2"
-
-	case "$action" in
-	create | modify | delete | list)
-		if [[ -z "$username" && "$action" != "list" ]]; then
-			log_error "Username required for $action operation"
-			exit 1
-		fi
-		log_message "INFO" "Starting $action operation${username:+ for user: $username}"
-		;;
-	*)
-		log_error "Invalid action: $action"
-		echo "Usage: $0 {create|modify|delete|list} [username]" >&2
-		exit 1
-		;;
-	esac
-}
-
-# Execute main function with all arguments
-main "$@"
