@@ -1,0 +1,4 @@
+logs/*.log
+backups/*
+*.tmp
+*.swp
