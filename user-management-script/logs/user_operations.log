@@ -1,0 +1,21 @@
+[2026-01-28 23:01:28] [ERROR] This script must be run as root or with sudo
+[2026-01-28 23:01:38] [ERROR] This script must be run as root or with sudo
+[2026-01-28 23:01:54] [ERROR] This script must be run as root or with sudo
+[2026-01-28 23:02:20] [INFO] Root privilege check: PASSED
+[2026-01-28 23:02:20] [INFO] ==================== Script Execution Started ====================
+[2026-01-28 23:02:20] [INFO] Script: user_manager.sh v1.0.0
+[2026-01-28 23:02:20] [INFO] User: root
+[2026-01-28 23:02:20] [INFO] Date: 20260128_230220
+[2026-01-28 23:02:20] [INFO] Arguments: --help
+[2026-01-28 23:02:25] [INFO] Root privilege check: PASSED
+[2026-01-28 23:02:25] [INFO] ==================== Script Execution Started ====================
+[2026-01-28 23:02:25] [INFO] Script: user_manager.sh v1.0.0
+[2026-01-28 23:02:25] [INFO] User: root
+[2026-01-28 23:02:25] [INFO] Date: 20260128_230225
+[2026-01-28 23:02:25] [INFO] Arguments: list regular
+[2026-01-28 23:02:25] [INFO] Listing users (filter: regular)
+[2026-01-28 23:02:25] [INFO] User listing completed
+[2026-01-28 23:02:25] [INFO] Cleaning up old backups (retention: 30 days)
+[2026-01-28 23:02:25] [WARN] Backup directory does not exist: 
+[2026-01-28 23:02:25] [SUCCESS] Operation completed successfully
+[2026-01-28 23:02:25] [INFO] ==================== Script Execution Completed ====================
