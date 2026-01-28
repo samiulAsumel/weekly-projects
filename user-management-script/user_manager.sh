@@ -57,6 +57,8 @@ readonly ERROR_LOG_FILE="$LOG_PATH/$ERROR_LOG"
 
 # Default values for missing configuration are set in config file
 # Variables are already readonly from config file
+# Construct full backup path
+BACKUP_PATH="$SCRIPT_DIR/$BACKUP_DIR"
 
 # Backup file name
 readonly BACKUP_FILE="$BACKUP_PATH/passwd_backup_$DATE.tar.gz"

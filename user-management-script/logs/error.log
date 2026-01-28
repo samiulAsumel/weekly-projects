@@ -1,3 +1,5 @@
 [2026-01-28 23:01:28] [ERROR] This script must be run as root or with sudo
 [2026-01-28 23:01:38] [ERROR] This script must be run as root or with sudo
 [2026-01-28 23:01:54] [ERROR] This script must be run as root or with sudo
+[2026-01-28 23:08:59] [ERROR] Password must contain at least one uppercase letter
+[2026-01-28 23:09:01] [ERROR] Failed to set password for user: bob

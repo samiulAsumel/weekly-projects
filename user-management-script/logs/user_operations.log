@@ -19,3 +19,44 @@
 [2026-01-28 23:02:25] [WARN] Backup directory does not exist: 
 [2026-01-28 23:02:25] [SUCCESS] Operation completed successfully
 [2026-01-28 23:02:25] [INFO] ==================== Script Execution Completed ====================
+[2026-01-28 23:08:59] [INFO] Root privilege check: PASSED
+[2026-01-28 23:08:59] [INFO] ==================== Script Execution Started ====================
+[2026-01-28 23:08:59] [INFO] Script: user_manager.sh v1.0.0
+[2026-01-28 23:08:59] [INFO] User: root
+[2026-01-28 23:08:59] [INFO] Date: 20260128_230859
+[2026-01-28 23:08:59] [INFO] Arguments: create alice alice123
+[2026-01-28 23:08:59] [INFO] Creating user: alice
+[2026-01-28 23:08:59] [INFO] Username validation passed: alice
+[2026-01-28 23:08:59] [INFO] Creating system backup before operation
+[2026-01-28 23:08:59] [SUCCESS] Backup created: /media/samiul-wd11/01. RHCSA & RHCE/00. Linux Job Ready/02. GitHub/weekly-projects/user-management-script/backups/passwd_backup_20260128_230859.tar.gz
+[2026-01-28 23:08:59] [INFO] Backup size: 128K
+[2026-01-28 23:08:59] [INFO] Executing: useradd -m -s /bin/bash alice
+[2026-01-28 23:08:59] [SUCCESS] User account created: alice
+[2026-01-28 23:08:59] [ERROR] Password must contain at least one uppercase letter
+[2026-01-28 23:08:59] [INFO] User details: uid=1001(alice) gid=1001(alice) groups=1001(alice)
+[2026-01-28 23:08:59] [INFO] Home directory: /home/alice
+[2026-01-28 23:08:59] [INFO] Cleaning up old backups (retention: 30 days)
+[2026-01-28 23:08:59] [INFO] Old backup cleanup completed
+[2026-01-28 23:08:59] [SUCCESS] Operation completed successfully
+[2026-01-28 23:08:59] [INFO] ==================== Script Execution Completed ====================
+[2026-01-28 23:09:01] [INFO] Root privilege check: PASSED
+[2026-01-28 23:09:01] [INFO] ==================== Script Execution Started ====================
+[2026-01-28 23:09:01] [INFO] Script: user_manager.sh v1.0.0
+[2026-01-28 23:09:01] [INFO] User: root
+[2026-01-28 23:09:01] [INFO] Date: 20260128_230901
+[2026-01-28 23:09:01] [INFO] Arguments: create bob Alice123!
+[2026-01-28 23:09:01] [INFO] Creating user: bob
+[2026-01-28 23:09:01] [INFO] Username validation passed: bob
+[2026-01-28 23:09:01] [INFO] Creating system backup before operation
+[2026-01-28 23:09:01] [SUCCESS] Backup created: /media/samiul-wd11/01. RHCSA & RHCE/00. Linux Job Ready/02. GitHub/weekly-projects/user-management-script/backups/passwd_backup_20260128_230901.tar.gz
+[2026-01-28 23:09:01] [INFO] Backup size: 128K
+[2026-01-28 23:09:01] [INFO] Executing: useradd -m -s /bin/bash bob
+[2026-01-28 23:09:01] [SUCCESS] User account created: bob
+[2026-01-28 23:09:01] [INFO] Password validation passed
+[2026-01-28 23:09:01] [ERROR] Failed to set password for user: bob
+[2026-01-28 23:09:01] [INFO] User details: uid=1002(bob) gid=1002(bob) groups=1002(bob)
+[2026-01-28 23:09:01] [INFO] Home directory: /home/bob
+[2026-01-28 23:09:01] [INFO] Cleaning up old backups (retention: 30 days)
+[2026-01-28 23:09:01] [INFO] Old backup cleanup completed
+[2026-01-28 23:09:01] [SUCCESS] Operation completed successfully
+[2026-01-28 23:09:01] [INFO] ==================== Script Execution Completed ====================
