@@ -112,3 +112,62 @@ validate_username() { # Function: validate_username
 	log_message "info" "username validation passed: $username"
 	return 0
 }
+
+user_exist() { # Function: user_exists
+	local username="$1"
+
+	# id command returns info user
+	# &>/dev/null redirects all output to null (silent)
+	#  Returns 0 if user exists, non-zero if not
+
+	if id "$username" &>/dev/null; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+validate_password() { # Function: validate_password
+	local password="$1"
+
+	# Check minimum length
+	if [[ ${#password} -lt $password_min_length ]]; then
+		log_error "Password too short (min $password_min_length characters): $password"
+		return 1
+	fi
+
+	# If strong password required, check complexity
+	# Should Contain: uppercase, lowercase, number, special char
+	if [[ "$rewuired_STrong_password" == "true" ]]; then
+		# Check uppercase letter
+		if [[ ! "$password" =~ [A-Z] ]]; then
+			log_error "Password must contain at least one uppercase letter: $password"
+			return 1
+		fi
+
+		# Check for lowercase letter
+		if [[ ! "$password" =~ [a-z] ]]; then
+			log_error "Password must contain at least one lowercase letter: $password"
+			return 1
+		fi
+
+		# check for number
+		if [[ ! "$password" =~ [0-9] ]]; then
+			log_error "Password must contain at least one number: $password"
+			return 1
+		fi
+
+		# Check for special character
+		if [[ ! "$password" =~ [^a-zA-Z0-9] ]]; then
+			log_error "Password must contain at least one special character: $password"
+			return 1
+		fi
+	fi
+
+	log_message "info" "Password validation passed: $password"
+	return 0
+}
+
+#----------------------------------------------------------------
+# Backup functions
+# Always backup before modification - allows recovery if something fails
