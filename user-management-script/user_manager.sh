@@ -108,4 +108,7 @@ validate_username() { # Function: validate_username
 		echo "- Be no longer than 32 characters"
 		return 1
 	fi
+
+	log_message "info" "username validation passed: $username"
+	return 0
 }
