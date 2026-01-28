@@ -1,4 +1,45 @@
-logs/*.log
-backups/*
+# Logs
+logs/
+*.log
+
+# Backups
+backups/
+*.backup
+*.bak
+
+# Temporary files
 *.tmp
+*.temp
 *.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# Runtime files
+*.pid
+*.lock
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Test artifacts
+test-results/
+coverage/
+
+# Build artifacts
+build/
+dist/
+*.tar.gz
+
+# Docker
+.dockerignore
